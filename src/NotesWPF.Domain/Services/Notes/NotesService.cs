@@ -22,13 +22,13 @@ public class NotesService : INotesService
 
     public async Task AddNoteAsync(Note note)
     {
-        await _noteValidator.ValidateAsync(note);
+        await _noteValidator.ValidateAndThrowAsync(note);
         await _notesRepository.AddNoteAsync(note);
     }
 
     public async Task UpdateNoteAsync(Note note)
     {
-        await _noteValidator.ValidateAsync(note);
+        await _noteValidator.ValidateAndThrowAsync(note);
         await _notesRepository.UpdateNoteAsync(note);
     }
 

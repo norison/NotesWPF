@@ -7,11 +7,11 @@ public class SemaphoreSlimFactory : ISemaphoreSlimFactory
 {
     public ISemaphoreSlim Create(int initialCount)
     {
-        return new SemaphoreSlimWrapper(initialCount);
+        return new SemaphoreSlimAdapter(initialCount);
     }
 
     public ISemaphoreSlim Create(int initialCount, int maxCount)
     {
-        return new SemaphoreSlimWrapper(initialCount, maxCount);
+        return new SemaphoreSlimAdapter(initialCount, maxCount);
     }
 }

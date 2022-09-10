@@ -1,4 +1,5 @@
-﻿using NotesWPF.DataAccess.Models;
+﻿using System.Runtime.Serialization;
+using NotesWPF.DataAccess.Models;
 using NotesWPF.DataAccess.Services.File;
 using NotesWPF.DataAccess.Services.Serialization;
 
@@ -17,12 +18,17 @@ public class NotesLoader : INotesLoader
 
     public async Task<IEnumerable<Note>> LoadNotesAsync(string path)
     {
+        if (!_fileService.Exists(path))
+        {
+            return new List<Note>();
+        }
+
         var json = await _fileService.ReadAllTextAsync(path);
         var notes = _serializationService.DeserializeObject<IEnumerable<Note>>(json);
 
         if (notes == null)
         {
-            throw new Exception("Failed to deserialize notes from file.");
+            throw new SerializationException("Failed to deserialize notes from file.");
         }
 
         return notes;
