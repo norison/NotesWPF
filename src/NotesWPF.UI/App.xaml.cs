@@ -12,6 +12,7 @@ using NotesWPF.DataAccess.Services.Serialization;
 using NotesWPF.DataAccess.Settings;
 using NotesWPF.Domain.Services.Notes;
 using NotesWPF.Domain.Validators;
+using NotesWPF.UI.Constants;
 using NotesWPF.UI.Models;
 using NotesWPF.UI.Views;
 using Prism.Ioc;
@@ -28,6 +29,7 @@ namespace NotesWPF.UI
             ConfigureServices(containerRegistry);
             ConfigureSettings(containerRegistry);
             ConfigureMappings(containerRegistry);
+            ConfigureNavigation(containerRegistry);
         }
 
         protected override Window CreateShell()
@@ -66,6 +68,11 @@ namespace NotesWPF.UI
             });
 
             containerRegistry.RegisterSingleton<IMapper>(() => configuration.CreateMapper());
+        }
+
+        private static void ConfigureNavigation(IContainerRegistry containerRegistry)
+        {
+            containerRegistry.RegisterForNavigation<NoteListView>(Pages.NoteListPage);
         }
     }
 }

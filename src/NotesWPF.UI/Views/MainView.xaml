@@ -4,70 +4,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:viewModels="clr-namespace:NotesWPF.UI.ViewModels"
-        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
+        xmlns:prism="http://prismlibrary.com/"
+        xmlns:constants="clr-namespace:NotesWPF.UI.Constants"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
         Title="Notes"
         WindowStartupLocation="CenterScreen"
-        MinHeight="400"
-        MinWidth="500"
-        Height="400"
-        Width="500"
+        MinHeight="500"
+        MinWidth="600"
+        Height="500"
+        Width="600"
         Background="{StaticResource MaterialDesignPaper}">
 
-    <b:Interaction.Triggers>
-        <b:EventTrigger EventName="Loaded">
-            <b:InvokeCommandAction Command="{Binding LoadNotesCommand}" />
-        </b:EventTrigger>
-    </b:Interaction.Triggers>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
 
-    <DockPanel>
-
-        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
-            <TextBox materialDesign:HintAssist.Hint="Title" MinWidth="100" Margin="5" Text="{Binding Title}" />
-            <TextBox materialDesign:HintAssist.Hint="Content" MinWidth="100" Margin="5" Text="{Binding Content}" />
-            <Button Margin="5"
-                    Style="{StaticResource MaterialDesignRaisedDarkButton}"
-                    Content="Add New Note"
-                    Command="{Binding AddNewNoteCommand}" />
-
-            <TextBlock VerticalAlignment="Center"
-                       Text="{Binding LastError}"
-                       Foreground="{StaticResource MaterialDesignValidationErrorBrush}" />
-        </StackPanel>
-
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <ItemsControl
-                ItemsSource="{Binding Notes}"
-                Grid.IsSharedSizeScope="True">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border Padding="8" BorderThickness="0 0 0 1"
-                                BorderBrush="{DynamicResource MaterialDesignDivider}">
-                            <DockPanel>
-
-                                <StackPanel Margin="8 0 0 0">
-                                    <TextBlock Text="{Binding Title}" FontWeight="Bold" />
-                                    <TextBlock Text="{Binding Content}" />
-                                </StackPanel>
-
-                                <StackPanel HorizontalAlignment="Right"
-                                            Orientation="Horizontal">
-                                    <Button Style="{StaticResource MaterialDesignOutlinedDarkButton}"
-                                            Margin="0 0 5 0 "
-                                            Content="Edit" />
-                                    <Button Style="{StaticResource MaterialDesignOutlinedDarkButton}"
-                                            Content="Delete"
-                                            Command="{Binding Path=DataContext.DeleteNoteCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ItemsControl}}}"
-                                            CommandParameter="{Binding Id}" />
-                                </StackPanel>
-                            </DockPanel>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
-
-    </DockPanel>
+        <ProgressBar Grid.Row="0" IsIndeterminate="True" Visibility="{Binding ProgressBarVisibility}" />
+        <ContentControl Grid.Row="1" prism:RegionManager.RegionName="{x:Static constants:Regions.MainRegion}" />
+    </Grid>
 </Window>
