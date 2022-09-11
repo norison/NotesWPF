@@ -124,13 +124,13 @@ public class NoteListViewModel : BindableBase
             {
                 return;
             }
-            
+
             var note = _mapper.Map<Note>(updatedNote);
 
             await ExecuteFuncAsync(async () =>
             {
                 await _notesService.UpdateNoteAsync(note);
-                
+
                 currentNote.Title = updatedNote.Title;
                 currentNote.Content = updatedNote.Content;
             });
@@ -143,16 +143,12 @@ public class NoteListViewModel : BindableBase
 
     private async void LoadNotesAsync()
     {
-        try
+        await ExecuteFuncAsync(async () =>
         {
             var notes = await _notesService.GetAllNotesAsync();
             var noteModels = _mapper.Map<IEnumerable<Note>, IEnumerable<NoteModel>>(notes);
             Notes = new ObservableCollection<NoteModel>(noteModels);
-        }
-        catch (Exception exception)
-        {
-            LastError = exception.Message;
-        }
+        });
     }
 
     private void ToggleLoading()
