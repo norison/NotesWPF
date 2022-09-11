@@ -153,10 +153,7 @@ public class NoteListViewModel : BindableBase
 
     private void ToggleLoading()
     {
-        var evt = _eventAggregator.GetEvent<ProgressBarEvent>();
-
-        evt.Publish(!IsLoading);
-        IsLoading = !IsLoading;
+        _eventAggregator.GetEvent<ProgressBarEvent>().Publish(IsLoading = !IsLoading);
     }
 
     private async Task ExecuteFuncAsync(Func<Task> func)
