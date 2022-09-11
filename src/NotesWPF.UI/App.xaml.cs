@@ -13,6 +13,7 @@ using NotesWPF.DataAccess.Settings;
 using NotesWPF.Domain.Services.Notes;
 using NotesWPF.Domain.Validators;
 using NotesWPF.UI.Constants;
+using NotesWPF.UI.Dialogs.EditNoteDialog;
 using NotesWPF.UI.Models;
 using NotesWPF.UI.Views;
 using Prism.Ioc;
@@ -30,6 +31,7 @@ namespace NotesWPF.UI
             ConfigureSettings(containerRegistry);
             ConfigureMappings(containerRegistry);
             ConfigureNavigation(containerRegistry);
+            ConfigureDialogs(containerRegistry);
         }
 
         protected override Window CreateShell()
@@ -73,6 +75,11 @@ namespace NotesWPF.UI
         private static void ConfigureNavigation(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterForNavigation<NoteListView>(Pages.NoteListPage);
+        }
+
+        private static void ConfigureDialogs(IContainerRegistry containerRegistry)
+        {
+            containerRegistry.RegisterDialog<EditNoteDialog>(Constants.Dialogs.EditNoteDialog);
         }
     }
 }

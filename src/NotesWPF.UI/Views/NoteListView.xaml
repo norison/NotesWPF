@@ -48,7 +48,9 @@
                                     <Button Style="{StaticResource MaterialDesignOutlinedDarkButton}"
                                             Margin="0 0 5 0 "
                                             IsEnabled="{Binding Path=DataContext.IsLoading, Converter={StaticResource InverseBooleanConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ItemsControl}}}"
-                                            Content="Edit" />
+                                            Content="Edit"
+                                            Command="{Binding Path=DataContext.EditNoteDialogCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ItemsControl}}}"
+                                            CommandParameter="{Binding Path=DataContext, RelativeSource={RelativeSource Self}}" />
                                     <Button Style="{StaticResource MaterialDesignOutlinedDarkButton}"
                                             IsEnabled="{Binding Path=DataContext.IsLoading, Converter={StaticResource InverseBooleanConverter}, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ItemsControl}}}"
                                             Content="Delete"

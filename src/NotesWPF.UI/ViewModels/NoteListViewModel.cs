@@ -13,6 +13,7 @@ using NotesWPF.UI.Models;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using Prism.Services.Dialogs;
 
 namespace NotesWPF.UI.ViewModels;
 
@@ -23,16 +24,22 @@ public class NoteListViewModel : BindableBase
     private readonly INotesService _notesService;
     private readonly IMapper _mapper;
     private readonly IEventAggregator _eventAggregator;
+    private readonly IDialogService _dialogService;
 
     #endregion
 
     #region Constructor
 
-    public NoteListViewModel(INotesService notesService, IMapper mapper, IEventAggregator eventAggregator)
+    public NoteListViewModel(
+        INotesService notesService,
+        IMapper mapper,
+        IEventAggregator eventAggregator,
+        IDialogService dialogService)
     {
         _notesService = notesService;
         _mapper = mapper;
         _eventAggregator = eventAggregator;
+        _dialogService = dialogService;
 
         LoadNotesAsync();
     }
@@ -53,6 +60,7 @@ public class NoteListViewModel : BindableBase
 
     public ICommand AddNewNoteCommand => new DelegateCommand(AddNewNoteCommandHandler);
     public ICommand DeleteNoteCommand => new DelegateCommand<Guid?>(DeleteNoteCommandHandler);
+    public ICommand EditNoteDialogCommand => new DelegateCommand<NoteModel?>(EditNoteDialogCommandHandler);
 
     #endregion
 
@@ -92,6 +100,43 @@ public class NoteListViewModel : BindableBase
         });
     }
 
+    private void EditNoteDialogCommandHandler(NoteModel? noteModel)
+    {
+        if (noteModel == null)
+        {
+            return;
+        }
+
+        var dialogParameters = new DialogParameters { { "note", noteModel } };
+
+        // ReSharper disable once AsyncVoidLambda
+        _dialogService.ShowDialog(Constants.Dialogs.EditNoteDialog, dialogParameters, async (result) =>
+        {
+            if (result.Result != ButtonResult.OK)
+            {
+                return;
+            }
+
+            var updatedNote = result.Parameters.GetValue<NoteModel>("note");
+            var currentNote = Notes.First(x => x.Id == updatedNote.Id);
+
+            if (currentNote.Equals(updatedNote))
+            {
+                return;
+            }
+            
+            var note = _mapper.Map<Note>(updatedNote);
+
+            await ExecuteFuncAsync(async () =>
+            {
+                await _notesService.UpdateNoteAsync(note);
+                
+                currentNote.Title = updatedNote.Title;
+                currentNote.Content = updatedNote.Content;
+            });
+        });
+    }
+
     #endregion
 
     #region Private Methods
@@ -124,8 +169,8 @@ public class NoteListViewModel : BindableBase
         {
             ToggleLoading();
 
-            await func();
             await Task.Delay(2000);
+            await func();
         }
         catch (ValidationException exception)
         {
