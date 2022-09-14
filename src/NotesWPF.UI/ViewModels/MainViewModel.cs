@@ -9,16 +9,10 @@ namespace NotesWPF.UI.ViewModels;
 
 public class MainViewModel : BindableBase
 {
-    private readonly IRegionManager _regionManager;
-    private readonly IEventAggregator _eventAggregator;
-
     public MainViewModel(IRegionManager regionManager, IEventAggregator eventAggregator)
     {
-        _regionManager = regionManager;
-        _eventAggregator = eventAggregator;
-        _regionManager.RegisterViewWithRegion(Regions.MainRegion, Pages.NoteListPage);
-
-        _eventAggregator.GetEvent<ProgressBarEvent>().Subscribe(ProgressBarEventHandler);
+        regionManager.RegisterViewWithRegion(Regions.MainRegion, Pages.NoteListPage);
+        eventAggregator.GetEvent<ProgressBarEvent>().Subscribe(ProgressBarEventHandler);
     }
 
     public Visibility ProgressBarVisibility { get; set; } = Visibility.Hidden;

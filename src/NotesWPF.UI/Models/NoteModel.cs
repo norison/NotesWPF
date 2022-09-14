@@ -14,11 +14,6 @@ public class NoteModel : BindableBase, ICloneable
         return MemberwiseClone();
     }
 
-    private bool Equals(NoteModel other)
-    {
-        return Id.Equals(other.Id) && Title == other.Title && Content == other.Content;
-    }
-
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj)) return false;
@@ -29,5 +24,20 @@ public class NoteModel : BindableBase, ICloneable
     public override int GetHashCode()
     {
         return HashCode.Combine(Id, Title, Content);
+    }
+
+    public static bool operator ==(NoteModel? left, NoteModel? right)
+    {
+        return Equals(left, right);
+    }
+
+    public static bool operator !=(NoteModel? left, NoteModel? right)
+    {
+        return !Equals(left, right);
+    }
+
+    private bool Equals(NoteModel other)
+    {
+        return Id.Equals(other.Id) && Title == other.Title && Content == other.Content;
     }
 }

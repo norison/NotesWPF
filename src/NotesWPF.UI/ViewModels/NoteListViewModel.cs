@@ -59,8 +59,8 @@ public class NoteListViewModel : BindableBase
     #region Commands
 
     public ICommand AddNewNoteCommand => new DelegateCommand(AddNewNoteCommandHandler);
-    public ICommand DeleteNoteCommand => new DelegateCommand<Guid?>(DeleteNoteCommandHandler);
-    public ICommand EditNoteDialogCommand => new DelegateCommand<NoteModel?>(EditNoteDialogCommandHandler);
+    public ICommand DeleteNoteCommand => new DelegateCommand<NoteModel?>(DeleteNoteCommandHandler);
+    public ICommand EditNoteCommand => new DelegateCommand<NoteModel?>(EditNoteCommandHandler);
 
     #endregion
 
@@ -86,21 +86,21 @@ public class NoteListViewModel : BindableBase
         });
     }
 
-    private async void DeleteNoteCommandHandler(Guid? noteId)
+    private async void DeleteNoteCommandHandler(NoteModel? noteModel)
     {
-        if (noteId == null)
+        if (noteModel == null)
         {
             return;
         }
 
         await ExecuteFuncAsync(async () =>
         {
-            await _notesService.DeleteNoteAsync(noteId.Value);
-            Notes.Remove(Notes.First(x => x.Id == noteId));
+            await _notesService.DeleteNoteAsync(noteModel.Id);
+            Notes.Remove(noteModel);
         });
     }
 
-    private void EditNoteDialogCommandHandler(NoteModel? noteModel)
+    private void EditNoteCommandHandler(NoteModel? noteModel)
     {
         if (noteModel == null)
         {
@@ -109,32 +109,8 @@ public class NoteListViewModel : BindableBase
 
         var dialogParameters = new DialogParameters { { "note", noteModel } };
 
-        // ReSharper disable once AsyncVoidLambda
-        _dialogService.ShowDialog(Constants.Dialogs.EditNoteDialog, dialogParameters, async (result) =>
-        {
-            if (result.Result != ButtonResult.OK)
-            {
-                return;
-            }
-
-            var updatedNote = result.Parameters.GetValue<NoteModel>("note");
-            var currentNote = Notes.First(x => x.Id == updatedNote.Id);
-
-            if (currentNote.Equals(updatedNote))
-            {
-                return;
-            }
-
-            var note = _mapper.Map<Note>(updatedNote);
-
-            await ExecuteFuncAsync(async () =>
-            {
-                await _notesService.UpdateNoteAsync(note);
-
-                currentNote.Title = updatedNote.Title;
-                currentNote.Content = updatedNote.Content;
-            });
-        });
+        _dialogService.ShowDialog(Constants.Dialogs.EditNoteDialog, dialogParameters,
+            (result) => HandleEditNoteDialogResult(noteModel, result));
     }
 
     #endregion
@@ -177,6 +153,31 @@ public class NoteListViewModel : BindableBase
         {
             ToggleLoading();
         }
+    }
+
+    private async void HandleEditNoteDialogResult(NoteModel noteModel, IDialogResult result)
+    {
+        if (result.Result != ButtonResult.OK)
+        {
+            return;
+        }
+
+        var updatedNoteModel = result.Parameters.GetValue<NoteModel>("note");
+
+        if (noteModel == updatedNoteModel)
+        {
+            return;
+        }
+
+        var note = _mapper.Map<Note>(updatedNoteModel);
+
+        await ExecuteFuncAsync(async () =>
+        {
+            await _notesService.UpdateNoteAsync(note);
+
+            noteModel.Title = updatedNoteModel.Title;
+            noteModel.Content = updatedNoteModel.Content;
+        });
     }
 
     #endregion
